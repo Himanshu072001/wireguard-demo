@@ -52,7 +52,7 @@ extension TunnelConfiguration {
             }
 
             let interfaceSectionKeys: Set<String> = ["private_key", "listen_port", "fwmark"]
-            let peerSectionKeys: Set<String> = ["public_key", "preshared_key", "allowed_ip", "endpoint", "persistent_keepalive_interval", "last_handshake_time_sec", "last_handshake_time_nsec", "rx_bytes", "tx_bytes", "protocol_version"]
+            let peerSectionKeys: Set<String> = ["public_key", "preshared_key", "allowed_ip", "endpoint", "persistent_keepalive_interval", "last_handshake_time_sec", "last_handshake_time_nsec", "rx_bytes", "tx_bytes", "protocol_version", "blocked"]
 
             if parserState == .inInterfaceSection {
                 guard interfaceSectionKeys.contains(key) else {
@@ -162,6 +162,13 @@ extension TunnelConfiguration {
             }
             if txBytes != 0 {
                 peer.txBytes = txBytes
+            }
+         if let blockedString = attributes["blocked"] {
+            guard let blocked = UInt64(blockedString) else {
+                throw ParseError.peerHasInvalidBlockedCount(blockedString)
+            }
+            if blocked != 0 {
+                peer.blocked = blocked
             }
         }
         if let lastHandshakeTimeSecString = attributes["last_handshake_time_sec"] {
