@@ -163,29 +163,31 @@ extension TunnelConfiguration {
             if txBytes != 0 {
                 peer.txBytes = txBytes
             }
-         if let blockedString = attributes["blocked"] {
-            guard let blocked = UInt64(blockedString) else {
-                throw ParseError.peerHasInvalidBlockedCount(blockedString)
-            }
-            if blocked != 0 {
-                peer.blocked = blocked
-            }
-        }
-        if let lastHandshakeTimeSecString = attributes["last_handshake_time_sec"] {
-            var lastHandshakeTimeSince1970: TimeInterval = 0
-            guard let lastHandshakeTimeSec = UInt64(lastHandshakeTimeSecString) else {
-                throw ParseError.peerHasInvalidLastHandshakeTime(lastHandshakeTimeSecString)
-            }
-            if lastHandshakeTimeSec != 0 {
-                lastHandshakeTimeSince1970 += Double(lastHandshakeTimeSec)
-                if let lastHandshakeTimeNsecString = attributes["last_handshake_time_nsec"] {
-                    guard let lastHandshakeTimeNsec = UInt64(lastHandshakeTimeNsecString) else {
-                        throw ParseError.peerHasInvalidLastHandshakeTime(lastHandshakeTimeNsecString)
-                    }
-                    lastHandshakeTimeSince1970 += Double(lastHandshakeTimeNsec) / 1000000000.0
+            if let blockedString = attributes["blocked"] {
+                guard let blocked = UInt64(blockedString) else {
+                    throw ParseError.peerHasInvalidBlockedCount(blockedString)
                 }
-                peer.lastHandshakeTime = Date(timeIntervalSince1970: lastHandshakeTimeSince1970)
+                if blocked != 0 {
+                    peer.blocked = blocked
+                }
             }
+            if let lastHandshakeTimeSecString = attributes["last_handshake_time_sec"] {
+                var lastHandshakeTimeSince1970: TimeInterval = 0
+                guard let lastHandshakeTimeSec = UInt64(lastHandshakeTimeSecString) else {
+                    throw ParseError.peerHasInvalidLastHandshakeTime(lastHandshakeTimeSecString)
+                }
+                if lastHandshakeTimeSec != 0 {
+                    lastHandshakeTimeSince1970 += Double(lastHandshakeTimeSec)
+                    if let lastHandshakeTimeNsecString = attributes["last_handshake_time_nsec"] {
+                        guard let lastHandshakeTimeNsec = UInt64(lastHandshakeTimeNsecString) else {
+                            throw ParseError.peerHasInvalidLastHandshakeTime(lastHandshakeTimeNsecString)
+                        }
+                        lastHandshakeTimeSince1970 += Double(lastHandshakeTimeNsec) / 1000000000.0
+                    }
+                    peer.lastHandshakeTime = Date(timeIntervalSince1970: lastHandshakeTimeSince1970)
+                }
+            }
+            return peer
         }
         return peer
     }
